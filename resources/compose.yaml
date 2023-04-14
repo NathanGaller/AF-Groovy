@@ -1,0 +1,92 @@
+version: "3"
+
+x-variables: &variables
+  DB_USERNAME: ${DB_USERNAME}
+  DB_PASSWORD: ${DB_PASSWORD}
+  DB_HOST: ${DB_HOST}
+  DB_PORT: ${DB_PORT}
+  DB_NAME: ${DB_NAME}
+  ENCRYPT_SECRET_KEY: ${ENCRYPT_SECRET_KEY}
+  JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+  #APP_SERVICE_HOST: ${LOAD_BALANCER}
+
+services:
+
+  # Node Projects
+  account:
+    image: ${REGISTRY}/ng-aline-account
+    ports:
+      - ${ACCOUNT_PORT}:${ACCOUNT_PORT}
+    environment:
+      <<: *variables
+      APP_PORT: ${ACCOUNT_PORT}
+    restart: on-failure
+    
+  user:
+    image: ${REGISTRY}/ng-aline-user
+    ports:
+      - ${USER_PORT}:${USER_PORT}
+    environment:
+      <<: *variables
+      APP_PORT: ${USER_PORT}
+    restart: on-failure
+    
+  bank:
+    image: ${REGISTRY}/ng-aline-bank
+    ports:
+      - ${BANK_PORT}:${BANK_PORT}
+    environment:
+      <<: *variables
+      APP_PORT: ${BANK_PORT}
+    restart: on-failure
+    
+  underwriter:
+    image: ${REGISTRY}/ng-aline-underwriter
+    ports:
+      - ${UNDERWRITER_PORT}:${UNDERWRITER_PORT}
+    environment:
+      <<: *variables
+      APP_PORT: ${UNDERWRITER_PORT}
+    restart: on-failure
+    
+  transaction:
+    image: ${REGISTRY}/ng-aline-transaction
+    ports:
+      - ${TRANSACTION_PORT}:${TRANSACTION_PORT}
+    environment:
+      <<: *variables
+      APP_PORT: ${TRANSACTION_PORT}
+    restart: on-failure
+
+x-aws-cloudformation:
+  Resources:
+    AccountTCP8072TargetGroup:
+      Properties:
+        HealthCheckIntervalSeconds: 180
+        HealthCheckTimeoutSeconds: 30
+        HealthyThresholdCount: 5
+        UnhealthyThresholdCount: 5
+    UserTCP8071TargetGroup:
+      Properties:
+        HealthCheckIntervalSeconds: 180
+        HealthCheckTimeoutSeconds: 30
+        HealthyThresholdCount: 5
+        UnhealthyThresholdCount: 5
+    BankTCP8083TargetGroup:
+      Properties:
+        HealthCheckIntervalSeconds: 180
+        HealthCheckTimeoutSeconds: 30
+        HealthyThresholdCount: 5
+        UnhealthyThresholdCount: 5
+    UnderwriterTCP8070TargetGroup:
+      Properties:
+        HealthCheckIntervalSeconds: 180
+        HealthCheckTimeoutSeconds: 30
+        HealthyThresholdCount: 5
+        UnhealthyThresholdCount: 5
+    TransactionTCP8073TargetGroup:
+      Properties:
+        HealthCheckIntervalSeconds: 180
+        HealthCheckTimeoutSeconds: 30
+        HealthyThresholdCount: 5
+        UnhealthyThresholdCount: 5
